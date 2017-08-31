@@ -23,7 +23,6 @@ class CmsUserManager(BaseUserManager):
     def create_superuser(self, username, password):
 
         user = self.create_user(username = username,
-                                
                                 password=password,
                                 )
         user.is_admin = True  # 比创建用户多的一个字段
@@ -43,8 +42,7 @@ class CmsUser(AbstractBaseUser):
     nickname = models.CharField(verbose_name='昵称', max_length=50, blank=True)
     sex = models.SmallIntegerField(verbose_name='性别', default=0, choices=SEX_STATUS)
     birth = models.DateField(blank=True, null=True,verbose_name ='生日')
-    create_date = models.DateTimeField(auto_now=True, verbose_name='创建时间')
-    #login_date = models.DateField(verbose_name='上次登录时间',null=True)        
+    create_date = models.DateTimeField(auto_now=True, verbose_name='创建时间')    
     is_active = models.BooleanField(default=True,verbose_name='是否启用')
     is_admin = models.BooleanField(default=False,verbose_name='是否为超级管理员')
     

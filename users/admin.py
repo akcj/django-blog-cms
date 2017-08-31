@@ -32,7 +32,7 @@ class UserCreationForm(forms.ModelForm):
 
 class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(label=("密码"),
-      help_text=("你需要重新设置密码，不要犹豫了，老司机，<a href=\"../password/\">快上车</a>."))
+      help_text=("在这里，<a href=\"../password/\">重置密码</a>."))
     class Meta:
         model = CmsUser
         fields = ('username', 'password', 'is_active', 'is_admin')
@@ -42,12 +42,12 @@ class UserChangeForm(forms.ModelForm):
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('username', 'email','is_active','is_admin',)
-    list_filter = ('is_admin',)
+    list_display = ('username', 'email','nickname','sex','birth','create_date','last_login','is_active','is_admin',)
+    list_filter = ('is_admin','create_date')
     fieldsets = (
         ('', {'fields': ('username', 'password')}),
-        ('个人信息', {'fields': ('email',)}),
-        ('权限', {'fields': ('is_admin', 'is_active')}),
+        ('个人信息', {'fields': ('email','nickname','sex','birth')}),
+        ('权限', {'fields': ( 'is_active','is_admin',)}),
     )
     add_fieldsets = (
         ('Add user', {
@@ -55,7 +55,7 @@ class UserAdmin(BaseUserAdmin):
             'fields': ('username', 'password1', 'password2')}
          ),
     )
-    #search_fields = ('username')
+    search_fields = ('username','email',)
     #ordering = ('')
     filter_horizontal = ()
 
