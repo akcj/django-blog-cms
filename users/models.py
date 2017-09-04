@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.http import HttpResponse
+import os
 # Create your models here.
 class CmsUserManager(BaseUserManager):
     """自定义用户管理器"""
@@ -29,7 +30,7 @@ class CmsUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class CmsUser(AbstractBaseUser):
+class CmsUser(AbstractBaseUser,PermissionsMixin):
 
     SEX_STATUS = (
         (0, '保密'),
@@ -38,9 +39,12 @@ class CmsUser(AbstractBaseUser):
     )
 
     username = models.CharField(max_length=32, unique=True, db_index=True,verbose_name='用户名')
+    avatar = models.ImageField(max_length=200,upload_to='avatar/%Y/%m/%d' ,default='default.png', verbose_name=u'用户头像')
     email = models.EmailField(unique=True,verbose_name='邮箱')
     nickname = models.CharField(verbose_name='昵称', max_length=50, blank=True)
+    profile = models.TextField(max_length=200,verbose_name=u'个人简介',blank=True,null=True)
     sex = models.SmallIntegerField(verbose_name='性别', default=0, choices=SEX_STATUS)
+    telephone = models.CharField(max_length=50,null=True,verbose_name='电话')
     birth = models.DateField(blank=True, null=True,verbose_name ='生日')
     create_date = models.DateTimeField(auto_now=True, verbose_name='创建时间')    
     is_active = models.BooleanField(default=True,verbose_name='是否启用')
@@ -79,7 +83,7 @@ class CmsUser(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
-
+        
     class Meta:
         verbose_name = '用户'
         verbose_name_plural = '用户'

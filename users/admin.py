@@ -35,22 +35,22 @@ class UserChangeForm(forms.ModelForm):
       help_text=("在这里，<a href=\"../password/\">重置密码</a>."))
     class Meta:
         model = CmsUser
-        fields = ('username', 'password', 'is_active', 'is_admin')
+        fields = ('password', 'is_active', 'is_admin')
     def clean_password(self):
         return self.initial["password"]
 
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('username', 'email','nickname','sex','birth','create_date','last_login','is_active','is_admin',)
-    list_filter = ('is_admin','create_date')
+    list_display = ('username', 'email','nickname','sex','telephone','birth','create_date','last_login','is_active','is_admin',)
+    list_filter = ('is_admin','create_date','groups')
     fieldsets = (
-        ('', {'fields': ('username', 'password')}),
-        ('个人信息', {'fields': ('email','nickname','sex','birth')}),
+        (None, {'fields': ('password',)}),
+        ('个人信息', {'fields': ('avatar','email','nickname','sex','telephone','birth')}),
         ('权限', {'fields': ( 'is_active','is_admin',)}),
     )
     add_fieldsets = (
-        ('Add user', {
+        ('添加用户', {
             'classes': ('wide',),
             'fields': ('username', 'password1', 'password2')}
          ),
@@ -60,4 +60,4 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 admin.site.register(CmsUser,UserAdmin)
-admin.site.unregister(Group)
+#admin.site.unregister(Group)
