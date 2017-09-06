@@ -2,91 +2,138 @@
 from __future__ import unicode_literals
 
 from django.db import models
-
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.utils import six, timezone
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser,AbstractUser,PermissionsMixin,Group,Permission
 from django.http import HttpResponse
+
+from .validators import ASCIIUsernameValidator, UnicodeUsernameValidator
 import os
-# Create your models here.
-class CmsUserManager(BaseUserManager):
-    """自定义用户管理器"""
-    def create_user(self, username , password=None):
+
+class UserManager(BaseUserManager):
+    #use_in_migrations = True
+
+    def _create_user(self, username, email, password, **extra_fields):
+        """
+        Creates and saves a User with the given username, email and password.
+        """
         if not username:
-            raise ValueError('Users must have an username')
-
-        user = self.model(
-            username=username,
-        )
-
+            raise ValueError(_('The given username must be set'))
+        email = self.normalize_email(email)
+        #username = self.username
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password):
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(username, email, password, **extra_fields)
 
-        user = self.create_user(username = username,
-                                password=password,
-                                )
-        user.is_admin = True  # 比创建用户多的一个字段
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, username, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
 
-class CmsUser(AbstractBaseUser,PermissionsMixin):
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
 
+        return self._create_user(username, email, password, **extra_fields)
+
+class User(AbstractBaseUser,PermissionsMixin):
     SEX_STATUS = (
-        (0, '保密'),
-        (1, '男'),
-        (2, '女'),
+        (0, u'保密'),
+        (1, u'男'),
+        (2, u'女'),
     )
 
-    username = models.CharField(max_length=32, unique=True, db_index=True,verbose_name='用户名')
-    avatar = models.ImageField(max_length=200,upload_to='avatar/%Y/%m/%d' ,default='default.png', verbose_name=u'用户头像')
-    email = models.EmailField(unique=True,verbose_name='邮箱')
-    nickname = models.CharField(verbose_name='昵称', max_length=50, blank=True)
-    profile = models.TextField(max_length=200,verbose_name=u'个人简介',blank=True,null=True)
-    sex = models.SmallIntegerField(verbose_name='性别', default=0, choices=SEX_STATUS)
-    telephone = models.CharField(max_length=50,null=True,verbose_name='电话')
-    birth = models.DateField(blank=True, null=True,verbose_name ='生日')
-    create_date = models.DateTimeField(auto_now=True, verbose_name='创建时间')    
-    is_active = models.BooleanField(default=True,verbose_name='是否启用')
-    is_admin = models.BooleanField(default=False,verbose_name='是否为超级管理员')
-    
-    objects = CmsUserManager()
+    username_validator = UnicodeUsernameValidator() if six.PY3 else ASCIIUsernameValidator()
 
-    USERNAME_FIELD = 'username'  #必须有一个唯一标识
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        unique=True,
+        help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        validators=[username_validator],
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
+    )
+
+    email = models.EmailField(_('email address'), blank=True)
+
+    avatar = models.ImageField(max_length=200,upload_to='avatar/%Y/%m/%d' ,default='default.png', verbose_name=u'用户头像')
+    nickname = models.CharField(verbose_name=u'昵称', max_length=50, blank=True)
+    profile = models.TextField(max_length=200,verbose_name=u'个人简介',blank=True,null=True)
+    sex = models.SmallIntegerField(verbose_name=u'性别', default=0, choices=SEX_STATUS)
+    telephone = models.CharField(max_length=50,verbose_name=u'电话')
+    birth = models.DateField(blank=True, null=True,verbose_name =u'生日')
+    create_date = models.DateField(auto_now=True, verbose_name=u'创建时间')
+
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
+
+    is_superuser = models.BooleanField(
+        _('superuser status'),
+        default=False,
+        help_text=u'是否为超级管理员。',
+    )
+    
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    objects = UserManager()
+
     EMAIL_FIELD = 'email'
-    #REQUIRED_FIELDS = ['email']  # 创建superuser时的必须字段
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    class Meta:
+        verbose_name = _('users')
+        verbose_name_plural = _('users')
+
+    def clean(self):
+        super(User, self).clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
 
     def get_full_name(self):
-        # The user is identified by their email address
-        return self.nickname
+        return self.username
 
     def get_short_name(self):
-        # The user is identified by their email address
         return self.username
 
-    def __str__(self):              # __unicode__ on Python 2
-        return self.username
+    def has_module_perms(self,app_label):
+        return True
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
         # Simplest possible answer: Yes, always
         return True
 
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
-
-
     @property
     def is_staff(self):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
-        return self.is_admin
-        
-    class Meta:
-        verbose_name = '用户'
-        verbose_name_plural = '用户'
-        
-    def __unicode__(self):
+        return self.is_superuser
+
+    def __unicode__(self):              # __unicode__ on Python 2
         return self.username
+
+    # def email_user(self, subject, message, from_email=None, **kwargs):
+    #     send_mail(subject, message, from_email, [self.email], **kwargs)
+# Create your models here.
+
+
+
