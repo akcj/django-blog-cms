@@ -1,6 +1,99 @@
 #-*- coding:utf-8 -*-
+from django.utils.translation import ugettext, ugettext_lazy as _
 from django import forms
 from .models import *
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
+
+class UserChangeForm(forms.ModelForm):
+    """A form for updating users. Includes all the fields on
+    the user, but replaces the password field with admin's
+    password hash display field.
+    """
+    password = ReadOnlyPasswordHashField(
+        label=_("Password"),
+        help_text=_(
+            "Raw passwords are not stored, so there is no way to see this "
+            "user's password, but you can change the password using "
+            "<a href=\"../password/\">this form</a>."
+        ),
+    )
+
+    email = forms.EmailField(
+        max_length=50,
+        label=u"电子邮箱",
+        help_text=u"点击这里，<a href=\"../email/\">修改邮箱</a>.",
+        )
+ 
+    class Meta:
+        model = User
+        #fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')
+        fields = '__all__'
+
+    def clean_password(self):
+        # Regardless of what the user provides, return the initial value.
+        # This is done here, rather than on the field, because the
+        # field does not have access to the initial value
+        return self.initial["password"]
+
+    def clean_email(self):
+        # Regardless of what the user provides, return the initial value.
+        # This is done here, rather than on the field, because the
+        # field does not have access to the initial value
+        return self.initial["email"]
+
+class AdminEmailChangeForm(forms.Form):
+    """
+    A form used to change the password of a user in the admin interface.
+    """
+    error_messages = {
+        'Email_mismatch':u"两次邮箱地址不一致！",
+    }
+    required_css_class = 'required'
+    email1 = forms.EmailField(
+        max_length=100,
+        label=u"邮箱地址",
+        widget=forms.TextInput(attrs={'autofocus': True}),
+        
+    )
+    email2 = forms.EmailField(
+        label=u"重复邮箱地址",
+        widget=forms.TextInput(attrs={'autofocus': True}),
+        help_text=u"为了校验，请输入与上面相同的邮箱地址。",
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(AdminEmailChangeForm, self).__init__(*args, **kwargs)
+
+    def clean_email2(self):
+        email1 = self.cleaned_data.get('email1')
+        email2 = self.cleaned_data.get('email2')
+        if email1 and email2:
+            if email1 != email2:
+                raise forms.ValidationError(
+                    self.error_messages['Email_mismatch'],
+                    code='Email_mismatch',
+                )
+        #password_validation.validate_password(password2, self.user)
+        return email2
+
+    def save(self, commit=True):
+        """
+        Saves the new password.
+        """
+        email = self.cleaned_data["email1"]
+        self.user.email = email
+        if commit:
+            self.user.save()
+        return self.user
+
+    @property
+    def changed_data(self):
+        data = super(AdminEmailChangeForm, self).changed_data
+        for name in self.fields.keys():
+            if name not in data:
+                return []
+        return ['email']
 
 # class RegForm(forms.Form):
 #     username = forms.CharField(
@@ -30,7 +123,9 @@ from .models import *
 #         max_length=30,
 #         min_length=8, 
 #         label=(u"重复密码"),
-#         widget=forms.PasswordInput(attrs={"placeholder": u"重复密码","size":"20","class":"form-control",}), 
+#         widget=forms.Pas
+#         
+#         swordInput(attrs={"placeholder": u"重复密码","size":"20","class":"form-control",}), 
 #         error_messages={"required": u"密码不能为空",'min_length':u'用户名长度不能小于8','max_length':u'用户名长度不能超过30',}
 #         )
 
