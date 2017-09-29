@@ -1,2 +1,2 @@
 *.pyc 
-blogcms/settings.py
+blogcms/dev_settings.py
