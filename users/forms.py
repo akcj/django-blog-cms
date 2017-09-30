@@ -54,14 +54,14 @@ class UserCreationForm(forms.ModelForm):
     """
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
-        'email_mismatch': u"该邮箱已经存在",
+        'email_mismatch': u"已存在一位使用该邮箱的用户。",
     }
 
     email = forms.EmailField(
         label=_("email address"),
         #strip=False,
         widget=forms.TextInput(attrs={'autofocus': True}),
-        # help_text=password_validation.password_validators_help_text_html(),
+        help_text=u'必填。',
     )
     password1 = forms.CharField(
         label=_("Password"),
@@ -87,8 +87,12 @@ class UserCreationForm(forms.ModelForm):
             self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({'autofocus': True})
     
     def clean_email(self):
-        password1 = self.cleaned_data.get("email")
-        User.objects.get()
+        email = self.cleaned_data.get("email")
+        if User.objects.get(email=email):
+            raise forms.ValidationError(
+                self.error_messages['email_mismatch'],
+                code='email_mismatch',
+            )
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")

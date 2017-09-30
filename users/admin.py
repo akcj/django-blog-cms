@@ -26,16 +26,17 @@ from users.forms import AdminEmailChangeForm,UserChangeForm,UserCreationForm
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
 
+
 class UserAdmin(UserBaseAdmin):
-    form = UserChangeForm
+    #form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('username', 'email','nickname','sex','telephone','birth','create_date','last_login','is_active',)
-    list_filter = ('create_date',)
+    list_display = ('username', 'email','nickname','sex','telephone','birth','create_date','last_login','is_active','is_staff','group_name',)
+    list_filter = ('create_date','last_login',)
     
     fieldsets = (
         (None, {'fields': ('password','email')}),
         (U'个人信息', {'fields': ('avatar','nickname','sex','birth')}),
-        ('权限', {'fields': ( 'is_active','groups',)}),
+        ('权限', {'fields': ( 'is_active','is_staff','groups',)}),
     )
     add_fieldsets = (
         (U'添加用户', {
@@ -131,4 +132,4 @@ class UserAdmin(UserBaseAdmin):
     #         context,
     #     )
 admin.site.register(User,UserAdmin)
-#admin.site.register(Group,GroupAdmin)
+admin.site.register(Permission)

@@ -4,43 +4,11 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import six, timezone
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser,PermissionsMixin,Group,Permission
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser,PermissionsMixin,UserManager
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from .validators import ASCIIUsernameValidator, UnicodeUsernameValidator
 import os
-
-class UserManager(BaseUserManager):
-    use_in_migrations = True
-
-    def _create_user(self, username, email, password, **extra_fields):
-        """
-        Creates and saves a User with the given username, email and password.
-        """
-        if not username:
-            raise ValueError(_('The given username must be set'))
-        email = self.normalize_email(email)
-        #username = self.username
-        user = self.model(username=username, email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_user(self, username, email=None, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_superuser', False)
-        return self._create_user(username, email, password, **extra_fields)
-
-    def create_superuser(self, username, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
-
-        return self._create_user(username, email, password, **extra_fields)
 
 class User(AbstractBaseUser,PermissionsMixin):
     SEX_STATUS = (
@@ -62,7 +30,7 @@ class User(AbstractBaseUser,PermissionsMixin):
         },
     )
 
-    email = models.EmailField(_('email address'), blank=True,null=True)
+    email = models.EmailField(_('email address'), blank=False)
 
     avatar = models.ImageField(max_length=200,upload_to='avatar/%Y/%m/%d' ,default='default.png', verbose_name=u'用户头像')
     nickname = models.CharField(verbose_name=u'昵称', max_length=50, blank=True)
