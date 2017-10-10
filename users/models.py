@@ -30,7 +30,10 @@ class User(AbstractBaseUser,PermissionsMixin):
         },
     )
 
-    email = models.EmailField(_('email address'), blank=False)
+    email = models.EmailField(_('email address'), unique=True,
+        error_messages={
+            'unique': _("A user with that email address already exists."),
+        },)
 
     avatar = models.ImageField(max_length=200,upload_to='avatar/%Y/%m/%d' ,default='default.png', verbose_name=u'用户头像')
     nickname = models.CharField(verbose_name=u'昵称', max_length=50, blank=True)
