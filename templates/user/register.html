@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<script type="text/javascript">
+    //验证表单  
+$("#login-form").validate({  
+    rules:{  
+        captcha_input:{  
+            required:true,  
+            remote:{  
+                url:'/accounts/verify/verifyAjax',  
+                type:'get',  
+                dataType:'json',  
+                data:{  
+                    code:function(){  
+                        return $("#captcha_input").val();  
+                    },  
+                },  
+            }  
+        }  
+    },  
+      
+     messages:{  
+        captcha_input:{  
+            required:"Verification code required",    
+            remote:"Verification code error",  
+        }  
+     },  
+      
+    //未验证时回调  
+    invalidHandler: function(form, validator) {  
+        //location.reload();  
+    }  
+});  
+  
+  
+//刷新验证码  
+$("#get_code_img").click(function() {         
+    $(".getcode").attr("src", "/accounts/verify/code?rand=" + Math.random());  
+    return false;  
+});  
+$(".getcode").attr("src", "/accounts/verify/code?rand=" + Math.random());  
+</script> 
+</head>
+<body>
+   <a href="#" id="get_code_img"><img src="/accounts/verify/code" class="getcode" /></a>  
+    <input type = "text", id = "captcha_input", name = "captcha_input">  
+</form>
+</body>
+</html>

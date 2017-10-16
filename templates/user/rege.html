@@ -17,29 +17,34 @@
         <div class="col-md-3 col-md-offset-3">
         <form method="POST" action="">
         {% csrf_token %}
-            <div class="form-group">
-            <label for="username">用户名</label>
-            <input type="username" class="form-control" id="username" name="username" placeholder="用户名">
-          </div>
           <div class="form-group">
-            <label for="exampleInputEmail1">邮箱</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="邮箱">
+            <label for="nickname">昵称</label>
+            <input type="text" class="form-control" id="nickname" name="nickname" placeholder="昵称">
+          </div>
+            <div class="form-group">
+            <label for="username">邮箱</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="邮箱">
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">密码</label>
-            <input type="password1" class="form-control" id="password1" name="password1" placeholder="密码">
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="密码">
           </div>
-           <div class="form-group">
+          <div class="form-group">
             <label for="exampleInputPassword1">重复密码</label>
-            <input type="password2" class="form-control" id="password2" name="password2" placeholder="重复密码">
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="重复密码">
           </div>
-          
-          <div class="checkbox">
-            <label>
-              <input type="checkbox"> Check me out
-            </label>
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
+          <!-- <div class="form-group">
+             <label for="exampleInputPassword1">验证码</label>
+             <div class="row">
+             <div class="col-md-8">
+             <input type="text" class="form-control" id = "captcha_input", name = "captcha_input" placeholder="验证码">
+             </div>
+             <div class="col-md-4">
+             <a href="#" id="get_code_img"><img src="/captcha" class="getcode" /></a> 
+             </div>
+             </div>
+                    </div> --> 
+          <button type="submit" class="btn btn-default">提交</button>
         </form>
         </div>
     </div>

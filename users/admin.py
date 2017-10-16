@@ -14,35 +14,35 @@ from django.contrib.auth.admin import UserAdmin as UserBaseAdmin
 from django.contrib.auth.admin import GroupAdmin 
 # Register your models here.
 from .models import User
-from users.forms import AdminEmailChangeForm,UserChangeForm,UserCreationForm
+#from users.forms import AdminEmailChangeForm,UserChangeForm,UserCreationForm
 
 
 
 class UserAdmin(UserBaseAdmin):
     #form = UserChangeForm
-    add_form = UserCreationForm
-    list_display = ('username', 'email','nickname','sex','telephone','birth','create_date','last_login','is_active','is_staff','group_name',)
+    #add_form = UserCreationForm
+    list_display = ('email','nickname','sex','telephone','birth','create_date','last_login','update_date','is_active','is_staff','group_name',)
     list_filter = ('create_date','last_login',)
     
     fieldsets = (
-        (None, {'fields': ('password','email')}),
+        (None, {'fields': ('password',)}),
         (U'个人信息', {'fields': ('avatar','nickname','sex','birth')}),
         ('权限', {'fields': ( 'is_active','is_staff','groups',)}),
     )
     add_fieldsets = (
         (U'添加用户', {
             'classes': ('wide',),
-            'fields': ('username','email', 'password1', 'password2')}
+            'fields': ('email', 'password1', 'password2')}
          ),
     )
     #raw_id_fields = ("groups",)
-    search_fields = ('username','email',)
+    search_fields = ('email',)
     ordering = ('-id',)
     # = ('groups',)
     filter_horizontal = ('groups','user_permissions',)
 
     def group_name(self,obj):
-        return obj.groups.name
+        return Group.objects.get(user=obj).name
     group_name.short_description = u'组别'
 
     def get_queryset(self, request):
