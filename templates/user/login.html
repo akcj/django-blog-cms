@@ -14,7 +14,7 @@
    <script type="text/javascript" src="{% static 'bootstrapvalidator/dist/js/bootstrapValidator.js' %}"></script>
    <script type="text/javascript" src="{% static 'bootstrapvalidator/src/js/language/zh_CN.js' %}"></script>
    <script src="{% static 'js/bootstrap.min.js' %}" ></script>
-   <script src="{% static 'js/register.js' %}" ></script>
+   <script src="{% static 'js/login.js' %}" ></script>
 
 <style type="text/css">
   .login{
@@ -31,13 +31,6 @@
         <form class="form-horizontal" id="defaultForm" method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
          <div class="form-group">
-              <label class="col-lg-2 control-label">昵称：</label>
-             <div class="col-lg-10">
-                 <input type="text" class="form-control" name="nickname" />
-             </div>
-         </div>
-
-         <div class="form-group">
               <label class="col-lg-2 control-label">邮箱：</label>
              <div class="col-lg-10">
                  <input type="text" class="form-control" name="email" />
@@ -50,13 +43,6 @@
                  <input type="password" class="form-control" name="password" />
               </div>
           </div>
-
-          <div class="form-group">
-              <label class="col-lg-2 control-label">重复密码：</label>
-              <div class="col-lg-10">
-                 <input type="password" class="form-control" name="confirmPassword" />
-              </div>
-          </div>
         
           <div class="form-group">
              <label class="col-lg-2 control-label" id="captchaOperation"></label>
@@ -67,7 +53,7 @@
 
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default">注册</button>
+              <button type="submit" class="btn btn-default">登录</button>
             </div>
           </div>
         </form>

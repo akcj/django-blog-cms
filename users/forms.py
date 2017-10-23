@@ -2,12 +2,11 @@
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django import forms
 from .models import *
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.forms import ReadOnlyPasswordHashField,AuthenticationForm
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation,
 )
-
-User = get_user_model()
+from django.contrib import auth
 # class RegisterForm(forms.Form):
 #     '''
 #     注册 
@@ -36,12 +35,24 @@ User = get_user_model()
 
 class LoginForm(forms.Form):
     '''
-    注册 
+    登录 
     ''' 
-    email = forms.EmailField(widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "请输入邮箱账号", "value": "", "required": "required",}),  
-                              max_length=50,error_messages={"required": "用户名不能为空",})  
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "请输入密码", "value": "", "required": "required",}),  
-                              min_length=8, max_length=50,error_messages={"required": "密码不能为空",})       
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder":u"请输入邮箱地址","required": True,}),  
+        max_length=50,
+        )  
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":u"请输入密码","required": True,}),  
+        max_length=50,
+        )
+    code = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder":u"请输入验证码","required": True,}),  
+        max_length=50,
+        )
+
+    def clean(self):
+        data = self.cleaned_data
+        return data   
 # class UserChangeForm(forms.ModelForm):
 #     """A form for updating users. Includes all the fields on
 #     the user, but replaces the password field with admin's
