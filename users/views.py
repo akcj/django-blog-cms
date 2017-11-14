@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.http import HttpResponse,HttpResponseRedirect,JsonResponse
+from django.http import HttpResponse,HttpResponseRedirect,JsonResponse,Http404
 from .models import *
 from .forms import RegisterForm,LoginForm
 from django.contrib.auth.forms import ReadOnlyPasswordHashField,AuthenticationForm
@@ -51,8 +51,8 @@ def login(request):
             # Redirect to a success page.
             return HttpResponseRedirect("/admin")
 
-    except Exception as e:
-        print e
+    except Exception:
+        raise Http404("User does not exist")
     return render(request, 'user/login.html',) 
 
 def register(request):

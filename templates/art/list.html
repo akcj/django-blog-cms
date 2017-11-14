@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+    <title></title>
+     <meta charset="utf-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link href="{% static 'bootstrapvalidator/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+   <link href="{% static 'css/base.css' %}" rel="stylesheet">
+   <link href="{% static 'fonts/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+   <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+   <link rel="stylesheet" href="{% static 'bootstrapvalidator/dist/css/bootstrapValidator.css' %}" rel="stylesheet"/>
+   <script src="{% static 'js/jquery2.1.1.min.js' %}" ></script>
+   <script type="text/javascript" src="{% static 'bootstrapvalidator/dist/js/bootstrapValidator.js' %}"></script>
+   <script type="text/javascript" src="{% static 'bootstrapvalidator/src/js/language/zh_CN.js' %}"></script>
+   <script src="{% static 'js/bootstrap.min.js' %}" ></script>
+   <script src="{% static 'js/login.js' %}" ></script>
+
+</style>
+</head>
+<body>
+<div class="container">
+  <ul>
+  {%for art in article_list%}
+  <li>{{ art.id }}--{{ art.title }}</li>
+  {%endfor%}
+  </ul>
+<div class="page">
+<ul class="pager">
+    {%for pages in plist%}
+{%if page == pages%}
+{{pages}}&nbsp;&nbsp;
+{%else%}
+{% if cat %}
+<a href="/cat/{{cat}}/page/{{pages}}">{{pages}}</a>&nbsp;&nbsp;
+{% else %}
+<a href="/page/{{pages}}">{{pages}}</a>&nbsp;&nbsp;
+{% endif %}
+{%endif%}
+{%endfor%}
+</ul>
+</div>
+</div>
+</body>
+</html>

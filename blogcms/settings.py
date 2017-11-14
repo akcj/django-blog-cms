@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'articles',
+    'simditor'
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'blogcms.urls'
@@ -68,7 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                #"django.core.context_processors.i18n",
+                "django.core.context_processors.i18n",
             ],
         },
     },
@@ -146,7 +147,7 @@ LOCALE_PATHS = (
 )
 
 #AUTH_USER_MODEL = "users.User"
-LANGUAGE_CODE = 'zh-Hans'
+LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -155,3 +156,21 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = False
+
+SIMDITOR_UPLOAD_PATH = 'uploads/'
+SIMDITOR_IMAGE_BACKEND = 'pillow'
+
+SIMDITOR_TOOLBAR = [
+    'title', 'bold', 'italic', 'underline', 'strikethrough', 'fontScale',
+    'color', '|', 'ol', 'ul', 'blockquote', 'code', 'table', '|', 'link',
+    'image', 'hr', '|', 'indent', 'outdent', 'alignment', 'fullscreen',
+    'markdown',
+]
+
+SIMDITOR_CONFIGS = {
+    'toolbar': SIMDITOR_TOOLBAR,
+    'upload': {
+        'url': '/simditor/upload/',
+        'fileKey': 'upload'
+    }
+}

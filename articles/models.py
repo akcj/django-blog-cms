@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from simditor.fields import RichTextField
 
 #文章标签模型
 class Tag(models.Model):  
@@ -54,7 +55,7 @@ class Article(models.Model):
     img = models.ImageField(upload_to='article/',verbose_name='首页展示图片')
     img_is_centent_show = models.SmallIntegerField(verbose_name='首页图片是否在文章顶端展示', default=0, choices=IMG_IS_SHOW)
     desc = models.TextField(verbose_name ='摘要',blank=True)
-    content = models.TextField(verbose_name ='文章内容')
+    content = RichTextField(verbose_name ='文章内容')
     categories = models.ForeignKey(Category,verbose_name ='分类')
     tags = models.ManyToManyField(Tag, blank=True,
                                         verbose_name = '标签'

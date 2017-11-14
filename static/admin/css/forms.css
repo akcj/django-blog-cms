@@ -146,7 +146,7 @@ form .aligned select + div.help {
 }
 
 form .aligned ul li {
-    list-style: none;
+     /*list-style: none; */
 }
 
 form .aligned table p {
