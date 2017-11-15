@@ -19,12 +19,15 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from django.conf import settings 
 from django.conf.urls.static import static
+from img.upload import *
 
 urlpatterns = [
     #url(r'^xadmin/', xadmin.site.urls),
     url(r'^admin/', admin.site.urls),
     url(r'^', include('users.urls')),
     url(r'^', include('articles.urls')),
+    url(r'^', include('img.urls')),
+    url(r'^admin/upload/(?P<dir_name>[^/]+)$', upload_image, name='upload_image'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
