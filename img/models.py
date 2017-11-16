@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import timezone
+from django.db.models.signals import post_delete
+from img.upload import delete_image_to_qiniu
+from django.http import HttpResponse
+
 # Create your models here.
 
 #图片标签模型
@@ -26,8 +30,15 @@ class Imgs(models.Model):
     tags = models.ManyToManyField(ImgsTag, blank=True,verbose_name = '图片标签')
     user_id = models.IntegerField(default=0,verbose_name ='作者',editable=False)
 
+    # def delete_file(sender,instance,**kwargs):
+    #     #return HttpResponse(kwargs['instance'])
+    #     url = 'media/'+str(instance.img_url)
+    #     delete_image_to_qiniu(key)
+
+    # post_delete.connect(delete_file,sender=self)
+
     def publish(self):
-        self.published_date = timezone.now()
+        self.upload_date = timezone.now()
         self.save()
 
     class Meta:  
@@ -35,4 +46,4 @@ class Imgs(models.Model):
         verbose_name_plural = verbose_name  
 
     def __unicode__(self):  
-        return self.title 
+        return str(self.id) 

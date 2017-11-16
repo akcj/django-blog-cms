@@ -4,10 +4,31 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from img.models import Imgs,ImgsTag
 from users.models import User
+from django.http import HttpResponse
+from img.upload import delete_image_to_qiniu
+from django.db.models.signals import post_delete
+from django.utils.safestring import mark_safe
+from django.conf import settings
 # Register your models here.
 class ImgsAdmin(admin.ModelAdmin):
-    list_display = ['img_url','title','nickname','upload_date']
+    list_display = ['id','image_img','title','nickname','upload_date']
     list_filter = ['upload_date']
+    readonly_fields = ('image_img',)
+    # 删除对象后删除七牛云的图片资源
+    def delete_file(sender,instance,**kwargs):
+        url = 'media/'+str(instance.img_url)
+        delete_image_to_qiniu(url)
+
+    post_delete.connect(delete_file,sender=Imgs)
+
+    # 图片展示
+    def image_img(self,obj):
+        if obj:
+            return mark_safe('<img src="%s" />' % (settings.MEDIA_URL+str(obj.img_url)+settings.IMG_THUMB))
+        else:
+            return '(no image)'
+ 
+    image_img.short_description = '缩略图'
     #超级用户则展示全部，非超级用户只展示和登录用户相关的信息
     # def get_queryset(self,request):
     #     qs = super(ImgsAdmin,self).get_queryset(request)

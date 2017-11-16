@@ -5,7 +5,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 import uuid
 import json
-from qiniu import Auth,put_data
+from qiniu import Auth,put_data,BucketManager
 import qiniu.config
 
 @csrf_exempt
@@ -45,3 +45,13 @@ def upload_image_to_qiniu(files,dir_name):
         return {"error": 0, "url":  PREFIX_URL + QINIU_BUCKET_DOMAIN+'/'+qiniu_file_name}
     else:
         return {"error": 1, "message": "上传失败"}
+
+def delete_image_to_qiniu(key):
+    BUCKET_NAME = settings.QINIU_BUCKET_NAME
+    ACCESS_KEY = settings.QINIU_ACCESS_KEY
+    SECRET_KEY = settings.QINIU_SECRET_KEY
+    
+    q = Auth(ACCESS_KEY, SECRET_KEY)
+    bucket = BucketManager(q)
+
+    ret, info = bucket.delete(BUCKET_NAME, key)

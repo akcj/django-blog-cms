@@ -147,6 +147,7 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
 )
 
+IMG_THUMB = '?imageView2/1/w/60/h/45'
 #AUTH_USER_MODEL = "users.User"
 LANGUAGE_CODE = 'zh-hans'
 
