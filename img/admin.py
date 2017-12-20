@@ -13,7 +13,6 @@ from django.conf import settings
 class ImgsAdmin(admin.ModelAdmin):
     list_display = ['id','image_img','title','nickname','upload_date']
     list_filter = ['upload_date']
-    readonly_fields = ('image_img',)
     # 删除对象后删除七牛云的图片资源
     def delete_file(sender,instance,**kwargs):
         url = 'media/'+str(instance.img_url)
