@@ -4,10 +4,19 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from articles.models import Article,Category,Tag
 from users.models import User
+from img.upload import delete_image_to_qiniu
+from django.db.models.signals import post_delete
 # Register your models here.
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ['title','nickname','published_date','status','comments_count','view_count',]
     list_filter = ['published_date']
+    # 删除对象后删除七牛云的图片资源
+    def delete_file(sender,instance,**kwargs):
+        url = 'media/' + str(instance.img)
+        delete_image_to_qiniu(url)
+
+    post_delete.connect(delete_file,sender=Article)
+
     #超级用户则展示全部，非超级用户只展示和登录用户相关的信息
     def get_queryset(self,request):
         qs = super(ArticleAdmin,self).get_queryset(request)
